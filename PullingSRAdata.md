@@ -19,9 +19,9 @@ This is an example of pulling 16S rRNA data from NCBI SRA for use in an amplicon
   * Based on the Biosample and SRA, you may decide whether or not this is a useful dataset for our hypothesis. If it is, then you can move on to the next steps.
 
 
-## Getting SRA Data on a Local Conda Installation
+## Getting SRA Data Using Conda
 
-- This is written for Conda environment 
+- If you have Conda, you can install the sra-tools from NCBI 
 	- You can also use these tools without having Conda, by installing through Unix (Instructions [here](https://ncbi.github.io/sra-tools/install_config.html)) and also some tips [here](https://reneshbedre.github.io/blog/fqutil.html) and [here](https://bioinformaticsworkbook.org/dataAcquisition/fileTransfer/sra.html).
 - For Conda, I found these [instructions](https://bio331.devbioinformatics.org/conda.html) for adding tools via command line helpful.
 
@@ -36,7 +36,7 @@ Check by downloading example file
 fastq-dump -A "SRR7694205"
 ```
 
-NOTE TO SELF: Come back [here](https://bioinformaticsworkbook.org/dataAcquisition/fileTransfer/sra.html) or [here](https://galaxyproject.org/support/ncbi-sra-fastq/)later to see how to deal with the `@SRR` lines in the fastq files if they become a problem.
+NOTE TO SELF: Come back [here](https://bioinformaticsworkbook.org/dataAcquisition/fileTransfer/sra.html) or [here](https://galaxyproject.org/support/ncbi-sra-fastq/) later to see how to deal with the `@SRR` lines in the fastq files if they become a problem.
 
 
 Example with BioProject PRJNA421986: (from the Green et al. paper: The Pacific oyster, Crassostrea gigas, associated microbial community.
