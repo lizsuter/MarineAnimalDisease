@@ -3,27 +3,27 @@ This is an example of pulling 16S rRNA data from NCBI SRA for use in an amplicon
 
 ## Guidelines for Picking a Marine Animal Microbiome Dataset
 
-1.	Do a literature search.
-  *	Look for papers which have 16S rRNA Illumina sequencing data (usually sequenced on a sequencer called ‘MiSeq’
-  *	Look for appropriate host organisms 
-  		*	Let’s try to stick to shellfish [oysters, clams, lobsters, abalone, etc.] to start since there has already been a lot of work on those. Fish may be appropriate too. Marine mammals may be a bit tricky at this point.
-  *	Look at the sampling scheme. Having multiple samples over a temperature gradient is key. If there is information on disease status of the host organism, even better.
-  *	Look for where the datasets are deposited (an NCBI Bioproject is probably most useful for us at this point but we could potentially work with data in ENA or DDBJ too).
-2.	Look up dataset. NCBI example:
-  *	[NCBI](https://www.ncbi.nlm.nih.gov/) has search menu. Choose ‘Bioproject’ and put in bioproject ID.
-  *	The search should show you info about the study and have links to the paper. 
-  *	Under ‘Project Data’ there are likely ‘SRA Experiments’ and ‘Biosamples.’ These are the links to the actual fastq files and their associated metadata. 
-    *	If you click through ‘Biosamples’ you will see information that the authors deposited from the sample (like temperature). Make sure you can understand the author’s meaning and what the data are here (it may help to go back to the paper).
-    *	In ‘SRA’ you will see links to the actual fastq files and their sequencing parameters (such as the primers that were used and if they were paired end or not.). This is also important information to understand.
-  *	Based on the Biosample and SRA, you may decide whether or not this is a useful dataset for our hypothesis. If it is, then you can move on to the next steps.
+1. Do a literature search.
+
+  * Look for papers which have 16S rRNA Illumina sequencing data (usually sequenced on a sequencer called ‘MiSeq’
+  * Look for appropriate host organisms 
+  	* Let’s try to stick to shellfish [oysters, clams, lobsters, abalone, etc.] to start since there has already been a lot of work on those. Fish may be appropriate too. Marine mammals may be a bit tricky at this point.
+  * Look at the sampling scheme. Having multiple samples over a temperature gradient is key. If there is information on disease status of the host organism, even better.
+  * Look for where the datasets are deposited (an NCBI Bioproject is probably most useful for us at this point but we could potentially work with data in ENA or DDBJ too).
+2. Look up dataset. NCBI example:
+  * [NCBI](https://www.ncbi.nlm.nih.gov/) has search menu. Choose ‘Bioproject’ and put in bioproject ID.
+  * The search should show you info about the study and have links to the paper. 
+  * Under ‘Project Data’ there are likely ‘SRA Experiments’ and ‘Biosamples.’ These are the links to the actual fastq files and their associated metadata. 
+	* If you click through ‘Biosamples’ you will see information that the authors deposited from the sample (like temperature). Make sure you can understand the author’s meaning and what the data are here (it may help to go back to the paper).
+	* In ‘SRA’ you will see links to the actual fastq files and their sequencing parameters (such as the primers that were used and if they were paired end or not.). This is also important information to understand.
+  * Based on the Biosample and SRA, you may decide whether or not this is a useful dataset for our hypothesis. If it is, then you can move on to the next steps.
 
 
 ## Getting SRA Data- local Conda installation
 
 - This is written for Conda environment 
-	- You can also use these tools without having Conda, by installing through Unix. [This](https://reneshbedre.github.io/blog/fqutil.html) looks helpful for doing so. Also [this](https://bioinformaticsworkbook.org/dataAcquisition/fileTransfer/sra.html
-)
-- Install the [here](https://ncbi.github.io/sra-tools/install_config.html)). For Conda, I found these [instructions](https://bio331.devbioinformatics.org/conda.html) for adding tools via command line helpful.
+	- You can also use these tools without having Conda, by installing through Unix (Instructions [here](https://ncbi.github.io/sra-tools/install_config.html)) and also some tips [here](https://reneshbedre.github.io/blog/fqutil.html) and [here](https://bioinformaticsworkbook.org/dataAcquisition/fileTransfer/sra.html).
+- For Conda, I found these [instructions](https://bio331.devbioinformatics.org/conda.html) for adding tools via command line helpful.
 
 
 ```
