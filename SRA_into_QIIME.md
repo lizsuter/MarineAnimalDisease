@@ -233,7 +233,7 @@ If you look at the documentation about the manifest files again, you'll see ther
 
 Phred is essentially a code for the quality of each base pair in the fastq file. Each bp is associated with a letter or symbol that correpsonds to a quality score, from 1 to 43 (the code is explained [here](https://www.drive5.com/usearch/manual/quality_score.html). This is  what QIIME reads later when we look at quality profiles. There are two Phred "codes", the older one, Phred64, and the newer one, Phred33. You likely have Phred33 fastq files but you can take a peak at a fastq file to be sure. If there are a lot of symbols everywhere, like this:
 
-<img src="images/phred33example.png">
+<img src="images/PHRED33example.png">
 
 Then you have Phred33. The Phred64 code is only letters.
 
