@@ -56,7 +56,7 @@ fastq-dump --split-files SRR6374533
 fastq-dump --split-files SRR6374534 SRR6374535
 ```
 
-	- To get a list of all files from one project, from BioProject page click on the SRA experiments > Send to> File> Format: Accession list. Then can paste this into terminal.
+- To get a list of all files from one project, from BioProject page click on the SRA experiments > Send to> File> Format: Accession list. Then can paste this into terminal.
 
 ## Get sample metadata 
 This is for making one file with all the contextual environmental data, like temperature, etc.
