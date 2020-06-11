@@ -19,7 +19,7 @@ This is an example of pulling 16S rRNA data from NCBI SRA for use in an amplicon
   * Based on the Biosample and SRA, you may decide whether or not this is a useful dataset for our hypothesis. If it is, then you can move on to the next steps.
 
 
-## Getting SRA Data- local Conda installation
+## Getting SRA Data on a Local Conda Installation
 
 - This is written for Conda environment 
 	- You can also use these tools without having Conda, by installing through Unix (Instructions [here](https://ncbi.github.io/sra-tools/install_config.html)) and also some tips [here](https://reneshbedre.github.io/blog/fqutil.html) and [here](https://bioinformaticsworkbook.org/dataAcquisition/fileTransfer/sra.html).
@@ -28,44 +28,41 @@ This is an example of pulling 16S rRNA data from NCBI SRA for use in an amplicon
 
 ```
 conda install -c bioconda sra-tools
-
 ```
 
 Check by downloading example file
 
 ```
-cd /Users/admin/Documents/Molloy/Research/MarineAnimalDisease 
-
 fastq-dump -A "SRR7694205"
 ```
 
-Worked! Come back [here](https://bioinformaticsworkbook.org/dataAcquisition/fileTransfer/sra.html) later to see how to deal with the `@SRR` lines if they become a problem.
+NOTE TO SELF: Come back [here](https://bioinformaticsworkbook.org/dataAcquisition/fileTransfer/sra.html) or [here](https://galaxyproject.org/support/ncbi-sra-fastq/)later to see how to deal with the `@SRR` lines in the fastq files if they become a problem.
 
 
-Try with one of the datasets I'm interested in, BioProject 
-PRJNA421986: The Pacific oyster, Crassostrea gigas, associated microbial community (went to SRA Run Selector and grabbed some of the SRR id's)
+Example with BioProject PRJNA421986: (from the Green et al. paper: The Pacific oyster, Crassostrea gigas, associated microbial community.
 
-- Navigate into removeable hard drive since these are large files.
-- Indicate that these are paired-end and download both reads
+- I went to SRA Run Selector and grabbed some of the SRR id's
+- `cd` into a local folder. (Using my removeable hard drive since these are large files.)
+- Run fastq-dump and indicate that these are paired-end. Download both F and R reads
 
 ```
 fastq-dump --split-files SRR6374533 
 ```
 
 
-- Try multiple files at once
+- Or download multiple files at once
 
 ```
 fastq-dump --split-files SRR6374534 SRR6374535
 ```
 
-To get a list of all files, from BioProject page click on the SRA experiments > Send to> File> Format: Accession list. 
+	- To get a list of all files from one project, from BioProject page click on the SRA experiments > Send to> File> Format: Accession list. Then can paste this into terminal.
 
 ## Get sample metadata 
 This is for making one file with all the contextual environmental data, like temperature, etc.
 
 
-First install NCBI's Utilties (got this from [here](https://anaconda.org/bioconda/entrez-direct))
+First install NCBI's Utilties (example [here](https://anaconda.org/bioconda/entrez-direct))
 
 ```
 conda install -c bioconda entrez-direct
