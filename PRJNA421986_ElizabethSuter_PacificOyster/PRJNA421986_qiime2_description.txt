@@ -1,0 +1,15 @@
+The phyloseq object in this file are data processed from Green et al. 2019 (doi: 10.1007/s00248-018-1242-9), NCBI BioProject # PRJNA421986.
+The ASV count table was produced using Qiime2 (v. 2020.02), calling DADA2 for denoising, merging, and ASV inference, and a Silva v132 Naive 
+Bayes classifier for taxonomy calling.
+Samples were collected from Pacific oyster (Crassostrea gigas) samples in Australia. AUthors performed a simulated heat wave in mesocosms to test
+impacts on microbiome.
+The phyloseq object, ps_filtered, was filtered to remove a subset of samples that were also used to test the impact of anitibiotics. The remaining 
+samples here were not treated with antibiotics. The remaining samples correspond to a time-zero (field) collection and a time-4day collection from two 
+different heat stress conditions (20˚C and 25˚C). Each assay has biological triplicates and thus there are 9 total samples.
+On day 4 in the 25˚C treatment, the oysters were showing signs of mortality.
+The metadata in this file come from the SraRunTable and have been modified to clearly indicate temperature and mortality data.
+The otu_table object in the phyloseq object contains absolute abundaces of ASVs, without any tranformation or agglomeration at higher taxonomic levels.
+
+qiime2 analysis file (done in Jupyter notebook) =  Qiime2_PRJNA421986.ipynb
+
+processing of qiime2 and preliminary stats file (done in R) = PRJNA421986_PacificOyster_QIIME2_postanalysis.Rmd

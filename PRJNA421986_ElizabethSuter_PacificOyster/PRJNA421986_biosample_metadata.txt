@@ -1,0 +1,15 @@
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	25PS3
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	25PS2
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	25PS1
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	20PS3
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	20PS2
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	20PS1
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	25C3
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	25C2
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	25C1
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	20C3
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	20C2
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	20C1
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	TO3
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	TO2
+Crassostrea gigas	whole oyster soft tissue	Jan-2017	Australia: New South Wales, Oyster Cove	32.44 S 151.57 E	TO1

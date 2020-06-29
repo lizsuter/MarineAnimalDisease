@@ -1,0 +1,181 @@
+1: 25C_PenStrep
+Identifiers: BioSample: SAMN08162508; Sample name: 25PS3; SRA: SRS2756836
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="25PS3"
+Accession: SAMN08162508	ID: 8162508
+
+2: 25C_PenStrep
+Identifiers: BioSample: SAMN08162507; Sample name: 25PS2; SRA: SRS2756832
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="25PS2"
+Accession: SAMN08162507	ID: 8162507
+
+3: 25C_PenStrep
+Identifiers: BioSample: SAMN08162506; Sample name: 25PS1; SRA: SRS2756849
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="25PS1"
+Accession: SAMN08162506	ID: 8162506
+
+4: 20C_PenStrep
+Identifiers: BioSample: SAMN08162505; Sample name: 20PS3; SRA: SRS2756846
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="20PS3"
+Accession: SAMN08162505	ID: 8162505
+
+5: 20C_PenStrep
+Identifiers: BioSample: SAMN08162504; Sample name: 20PS2; SRA: SRS2756833
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="20PS2"
+Accession: SAMN08162504	ID: 8162504
+
+6: 20C_PenStrep
+Identifiers: BioSample: SAMN08162503; Sample name: 20PS1; SRA: SRS2756854
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="20PS1"
+Accession: SAMN08162503	ID: 8162503
+
+7: 25C_Control
+Identifiers: BioSample: SAMN08162502; Sample name: 25C3; SRA: SRS2756851
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="25C3"
+Accession: SAMN08162502	ID: 8162502
+
+8: 25C_Control
+Identifiers: BioSample: SAMN08162501; Sample name: 25C2; SRA: SRS2756845
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="25C2"
+Accession: SAMN08162501	ID: 8162501
+
+9: 25C_Control
+Identifiers: BioSample: SAMN08162500; Sample name: 25C1; SRA: SRS2756843
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="25C1"
+Accession: SAMN08162500	ID: 8162500
+
+10: 20C_Control
+Identifiers: BioSample: SAMN08162499; Sample name: 20C3; SRA: SRS2756852
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="20C3"
+Accession: SAMN08162499	ID: 8162499
+
+11: 20C_Control
+Identifiers: BioSample: SAMN08162498; Sample name: 20C2; SRA: SRS2756850
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="20C2"
+Accession: SAMN08162498	ID: 8162498
+
+12: 20C_Control
+Identifiers: BioSample: SAMN08162497; Sample name: 20C1; SRA: SRS2756847
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="20C1"
+Accession: SAMN08162497	ID: 8162497
+
+13: Time_0_days
+Identifiers: BioSample: SAMN08162496; Sample name: TO3; SRA: SRS2756848
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="TO3"
+Accession: SAMN08162496	ID: 8162496
+
+14: Time_0_days
+Identifiers: BioSample: SAMN08162495; Sample name: TO2; SRA: SRS2756844
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="TO2"
+Accession: SAMN08162495	ID: 8162495
+
+15: Time_0_days
+Identifiers: BioSample: SAMN08162494; Sample name: TO1; SRA: SRS2756841
+Organism: oyster metagenome
+Attributes:
+    /host="Crassostrea gigas"
+    /isolation source="whole oyster soft tissue"
+    /collection date="Jan-2017"
+    /geographic location="Australia: New South Wales, Oyster Cove"
+    /latitude and longitude="32.44 S 151.57 E"
+    /Replicate="TO1"
+Accession: SAMN08162494	ID: 8162494
+
+

@@ -1,0 +1,540 @@
+---
+title: "Comparison of Output from 2 Amplicon Pipelines- Here I am processing the data from the Dada2/Decipher pipeline"
+author: "Liz Suter"
+date: "6/28/2020"
+---
+
+Using data from Green et al.:
+Green TJ, Siboni N, King WL, Labbate M, Seymour JR, Raftos D. 2019. Simulated Marine Heat Wave Alters Abundance and Structure of Vibrio Populations Associated with the Pacific Oyster Resulting in a Mass Mortality Event. Microb Ecol. 77(3):736–747. doi:10.1007/s00248-018-1242-9.
+
+I followed the BVCN lesson 3a and lesson 3b pipelines.
+Lesson 3a uses QIIME2, calling DADA2 for ASV assignment, and using a Naive Bayes classifier trained on Silva 132 for taxonomy assignment (data are in `qiime2_export`)
+Lesson 3b uses DADA2 directly in R (I used the Cyverse app I created), and IDTAXA (from Decipher) trained in Silva 138 for taxonomy assignment (data are in 'dada2_export')
+
+Modifications:
+
+* There were no blanks so did not remove contamination
+
+### Load packages
+
+```{r}
+library(tidyverse)
+library(phyloseq)
+library(dada2)
+library(Biostrings)
+library(DECIPHER)
+library(phangorn)
+library(readr)
+library(seqinr)
+library(decontam)
+library(ape)
+library(vegan)
+library(RColorBrewer)
+library(microbiome)
+library(DESeq2)
+```
+
+### Import the metadata associated with the samples
+These metadata can be used with both qiime2 and dada2 results.
+
+For this Bioproject, all info from Biosample file is also in SraRunTable, so I will only import SraRunTable (it is also formatted better)
+
+I manually modified the SraRunTable to split the sample names into numbers (since temperature was built into the sample name) and put some info about samples from the biosample_result.txt summary (eg. antibiotic treatment). I also added in a column for "mortality" because the paper indicates that oysters in the control samples at 25C faced higher mortality (~50% on day 4 when samples were collected; Fig. 1) and this was not seen in any other samples.
+
+Therefore, I am importing SraRunTableMod.txt
+
+```{r}
+SraRunTable <- read_delim("SraRunTableMod.csv", delim = ",")
+```
+
+
+### Import the results from Dada2
+
+```{r}
+# Import Count table. Skip first row of tsv file, which is just some text
+count_table <- read_tsv(file="dada2_export/ASVs_counts.tsv")
+# And specify that the first column of data are rownames
+count_table <- column_to_rownames(count_table, var = colnames(count_table)[1])
+
+
+# Import taxonomy of ASVs
+taxonomy <- read_tsv(file="dada2_export/ASVs_taxonomy.tsv")
+# And specify that the first column of data are rownames
+taxonomy <- column_to_rownames(taxonomy, var = colnames(taxonomy)[1])
+
+```
+
+
+
+### Check sequencing depth with rarefaction curves
+
+```{r}
+# Use rarecurve, from the Vegan package. Rarcurve expects the dataset as a dataframe so we need to use as.data.frame again:
+count_table_df <- as.data.frame(count_table)
+
+# Plot the rarefaction curves, color-coding by the colors listed in sample_info_tab, which indicate sample type, and transforming using t() again
+rarecurve(t(count_table_df), step=100, cex=0.5, ylab="ASVs", label=T)
+
+```
+
+Generally these seem to be sequenced to completion
+
+### Remove singletons
+
+```{r}
+count_table_no_singletons <- filter(count_table,rowSums(count_table)>1)
+# retains 5759 ASVs (out of 5776)
+```
+
+
+
+### Make tree  
+In the Dada2 tools, there are no options to build a tree (unlike in Qiime2) but we can build it here using DECIPHER and phangorn
+
+(Based on [https://f1000research.com/articles/5-1492/v2](https://f1000research.com/articles/5-1492/v2))
+
+
+Make an alignment using tools from Decipher (Note- alignment step takes a while. Commented out for now. Only need to run once)
+```{r}
+## import fasta
+fas <- "dada2_export/ASVs.fasta"
+seqs <- readDNAStringSet(fas)
+seqs
+
+# perform the alignment
+aligned <- AlignSeqs(seqs)
+
+# view the alignment in a browser (optional)
+BrowseSeqs(aligned, highlight=0)
+
+# write out aligned sequence file
+writeXStringSet(aligned, file="ASVs.aligned.fasta")
+```
+
+Use phangorn package to build tree. Here we are building a maximum likelihood neighbor-joining tree. (Also takes a while to run. Comment out for now.)
+
+```{r}
+phang.align <- phyDat(as(aligned, "matrix"), type="DNA") # convert to phyDat format
+dm <- dist.ml(phang.align) # calculate pairwise distance matrix 
+treeNJ <- NJ(dm) # perform neighbor-joining tree method
+fit = pml(treeNJ, data=phang.align) # compute intermal max likelihood
+```
+
+
+### Make one phyloseq object, which contains all 4 objects:
+
+Here we will do ordinations using the phyloseq package, which first requires making phyloseq objects out of each of our input data tables (in the last tutorial, I imported the tree using phyloseq so it is already a phyloseq object)
+
+```{r}
+ASV	=	otu_table(data.frame(count_table_no_singletons), taxa_are_rows =  TRUE)
+TAX	=	tax_table(as.matrix(taxonomy))
+META	=	sample_data(data.frame(SraRunTable, row.names = SraRunTable$Run))
+TREE = phy_tree(fit$tree)
+```
+
+
+First check that the inputs are in compatible formats by checking for ASV names with the phyloseq function, taxa_names
+```{r}
+head(taxa_names(TAX))
+head(taxa_names(ASV))
+head(taxa_names(TREE))
+```
+
+
+And check sample names were also detected
+```{r}
+head(sample_names(ASV))
+head(sample_names(META))
+```
+
+And make the phyloseq object
+```{r}
+ps <- phyloseq(ASV,	TAX,	META, TREE)
+```
+
+
+
+### Check some features of the phyloseq object
+
+```{r}
+rank_names(ps)
+
+unique(tax_table(ps)[, "domain"])
+
+table(tax_table(ps)[, "domain"], exclude = NULL)
+
+```
+
+
+Filter out those ambigious Domain annotations
+```{r}
+ps <- subset_taxa(ps, !is.na(domain) & !domain %in% c("", "Eukaryota"))
+
+table(tax_table(ps)[, "domain"], exclude = NULL)
+```
+
+Check out the phyla names
+```{r}
+table(tax_table(ps)[, "phylum"], exclude = NULL)
+```
+
+
+Filter out any with "NA" as phylum. For now, I am leaving in phyla with abundance of 1 
+```{r}
+ps <- subset_taxa(ps, !is.na(phylum) & !phylum %in% c(""))
+
+table(tax_table(ps)[, "phylum"], exclude = NULL)
+```
+After the above, 4377 ASVs remain. This is many fewer than the QIIME2 pipeline.
+
+
+Re-root tree (from experience, I have had to do this because you may have removed the root of your tree when pruning). 
+(I found this handy function from [here](https://john-quensen.com/r/unifrac-and-tree-roots/) which picks the longest branch to root from). There is also a compatibilty issue between the type of tree calculated by QIIME and the one expected by phyloseq, so we have to change that format as well (see [here](https://github.com/joey711/phyloseq/issues/936) for discussion)
+```{r}
+# first define function from link above to find furthest outgroup
+pick_new_outgroup <- function(tree.unrooted){
+require("magrittr")
+require("data.table")
+require("ape") # ape::Ntip
+# tablify parts of tree that we need.
+treeDT <- 
+     cbind(
+         data.table(tree.unrooted$edge),
+         data.table(length = tree.unrooted$edge.length)
+     )[1:Ntip(tree.unrooted)] %>% 
+ cbind(data.table(id = tree.unrooted$tip.label))
+ # Take the longest terminal branch as outgroup
+ new.outgroup <- treeDT[which.max(length)]$id
+ return(new.outgroup) }
+
+# then run on my phyloseq tree
+my.tree <- phy_tree(ps)
+out.group <- pick_new_outgroup(my.tree)
+out.group
+
+# Then use this outgroup to root the tree
+new.tree1 <- ape::root(my.tree, outgroup=out.group, resolve.root=TRUE)
+
+
+# and convert to dichotomy tree
+new.tree2 <- ape::multi2di(new.tree1)
+phy_tree(ps) <- new.tree2
+phy_tree(ps)
+
+```
+
+
+### Make some abundance plots
+
+Check overall how the phyla are distributed among samples. Phyloseq makes this easy
+
+```{r}
+# First aglomerate the ASVs at the phylum level using the phyloseq function, tax_glom
+phylumGlommed = tax_glom(ps, "phylum")
+
+# There are many phyla here, so have to make a custom color palette by interpolating from an existing one in RColorBrewer
+colourCount = length(table(tax_table(ps)[, "phylum"], exclude = NULL))
+getPalette = colorRampPalette(brewer.pal(9, "Spectral"))
+PhylaPalette = getPalette(colourCount)
+
+# and plot
+plot_bar(phylumGlommed, x = "Sample", fill = "phylum") + 
+  scale_fill_manual(values = PhylaPalette)
+```
+
+Plot compositional (relative abundances) instead of absolute abundance using microbiome::transform
+
+```{r}
+ps_ra <- microbiome::transform(ps, transform = "compositional")
+head(otu_table(ps_ra))
+```
+
+```{r}
+# Then aglomerate the ASVs at the phylum level using the phyloseq function, tax_glom
+phylumGlommed_RA = tax_glom(ps_ra, "phylum")
+# and plot
+plot_bar(phylumGlommed_RA, x = "Sample", fill = "phylum") + 
+  scale_fill_manual(values = PhylaPalette)
+```
+
+
+Check abundance plots for some taxa of interest
+
+The Proteobacteria
+```{r}
+# Remove the antibiotic treatments
+ps_filtered <- subset_samples(ps_ra, !Treatment %in% c("Pen-Strep")) #reduced from 15 to 9 samples
+
+# subset to proteobacteria
+ps_proteo_ra <- subset_taxa(ps_filtered, phylum == "Proteobacteria")
+
+# define colors
+colourCount = length(table(tax_table(ps_proteo_ra)[, "order"], exclude = NULL))
+getPalette = colorRampPalette(brewer.pal(9, "Spectral"))
+OrderPalette = getPalette(colourCount)
+
+# Then aglomerate the ASVs at the phylum level using the phyloseq function, tax_glom
+orderGlommed_RA = tax_glom(ps_proteo_ra, "order")
+# and plot
+plot_bar(orderGlommed_RA, x = "replicate", fill = "order") + 
+  scale_fill_manual(values = OrderPalette)
+```
+In the above you can see the increase in Vibrionales and Acetobacterales going from T0 to 20 to 25 and the decrease in Rhizobiales and Rhodobacterales
+
+The Actinobacteriota
+```{r}
+# subset to proteobacteria
+ps_actino_ra <- subset_taxa(ps_filtered, phylum == "Actinobacteriota")
+
+# define colors
+colourCount = length(table(tax_table(ps_actino_ra)[, "order"], exclude = NULL))
+getPalette = colorRampPalette(brewer.pal(9, "Spectral"))
+OrderPalette = getPalette(colourCount)
+
+# Then aglomerate the ASVs at the phylum level using the phyloseq function, tax_glom
+orderGlommed_RA = tax_glom(ps_actino_ra, "order")
+# and plot
+plot_bar(orderGlommed_RA, x = "replicate", fill = "order") + 
+  scale_fill_manual(values = OrderPalette)
+```
+In the above you can see a decrease in Micotrichales with increase in temperature
+
+
+The Campilobacterota (note, this is not a phylum that is annotated differently in Silva v132)
+```{r}
+# subset to proteobacteria
+ps_campo_ra <- subset_taxa(ps_filtered, phylum == "Campilobacterota")
+
+# define colors
+colourCount = length(table(tax_table(ps_campo_ra)[, "family"], exclude = NULL))
+getPalette = colorRampPalette(brewer.pal(9, "Spectral"))
+FamilyPalette = getPalette(colourCount)
+
+# Then aglomerate the ASVs at the phylum level using the phyloseq function, tax_glom
+familyGlommed_RA = tax_glom(ps_campo_ra, "family")
+# and plot
+plot_bar(familyGlommed_RA, x = "replicate", fill = "family") + 
+  scale_fill_manual(values = FamilyPalette)
+```
+There is also a slight increase in Arcobacteraceae from T0 to the warmer temperatures
+
+
+### Ordinations
+ 
+#### First transform
+
+Instead of relative abundances, need different transformation for stats. Microbiome package has both Hellinger and CLR built in. Try hellinger
+
+```{r}
+ps_hellinger <- microbiome::transform(ps, transform = "hellinger")
+head(otu_table(ps_hellinger))
+```
+
+
+**Principal coordinate analysis (PCoA) using Bray-Curtis**
+```{r}
+out.pcoa <- ordinate(ps_hellinger, method = "PCoA", distance = "bray")
+
+pcoa_plot = plot_ordination(ps_hellinger, out.pcoa, color ="Temperature", shape = "Treatment") +
+  geom_point(size = 3) 
+pcoa_plot
+```
+
+Scale axes by Eigenvalues
+
+```{r}
+evals <- out.pcoa$values$Eigenvalues
+
+pcoa_plot.scaled = plot_ordination(ps_hellinger, out.pcoa, color ="Temperature", shape = "Treatment") +
+  geom_point(size = 3) +
+  coord_fixed(sqrt(evals[2] / evals[1]))
+
+pcoa_plot.scaled
+```
+
+
+**Principal coordinate analysis (PCoA) using weighted UniFrac PCoA**
+Also scaling axes by eigenvalues
+
+```{r}
+out.pcoa <- ordinate(ps_hellinger, method = "PCoA", distance = "wunifrac")
+
+wuf_pcoa_plot = plot_ordination(ps_hellinger, out.pcoa, color ="Temperature", shape = "Treatment") +
+  geom_point(size = 3) +
+  coord_fixed(sqrt(evals[2] / evals[1]))
+
+
+wuf_pcoa_plot
+```
+
+**Non-Metric dimensional scaling (NMDS) ordination using Bray-Curtis**
+
+```{r}
+out.nmds <- ordinate(ps_hellinger, method = "NMDS", distance = "bray")
+
+nmds_plot = plot_ordination(ps_hellinger, out.nmds, color ="Temperature", shape = "Treatment") +
+  geom_point(size = 3) 
+
+nmds_plot
+```
+
+
+### Test for affects of temperature
+The above shows an apparent impact of temperature. I want to find out which organisms account for this.
+
+Filter out the antibiotic-treated samples. Those are not part of my hypothesis and would influence the interpretation of any results (as seen above).
+```{r}
+ps_filtered <- subset_samples(ps, !Treatment %in% c("Pen-Strep")) #reduced from 15 to 9 samples
+```
+
+
+#### Differential abundance with DeSeq2
+
+This uses untransformed data, as it does its own log 2 transformation in the DeSeq calculation
+```{r}
+ps_deseq <- phyloseq_to_deseq2(ps_filtered, ~Temperature)
+ps_deseq <- DESeq(ps_deseq)
+```
+
+
+
+
+*First Compare Control (Time zero) to Heat Stress (20C)*
+Pull out results
+```{r}
+ # pulling out our results table, we specify the object, the p-value, and what contrast we want to consider by first naming the column, then the two groups we care about
+deseq_res_temp_T0_20 <- results(ps_deseq, alpha=0.01, contrast=c("Temperature", "Time-zero", "20"))
+
+# Get a glimpse at what this table currently holds with the summary command
+summary(deseq_res_temp_T0_20) 
+```
+
+The above shows out of 3466 ASVs, there are 2 that increased when comparing t0 to 20 and 11 that decreased. Ie. the 2 that 'increased' are in higher abundance in "t0" than in "20" and the 11 that decreased are in lower abundance in t0 than in 20.
+
+
+Make a table of the significant results
+```{r}
+# subset the table to only include those ASVs that pass the specified significance level
+sigtab_deseq_res_temp_T0_20 <- deseq_res_temp_T0_20[which(deseq_res_temp_T0_20$padj < 0.01), ]
+
+# pull out their taxonomic affiliation
+sigtab_deseq_res_temp_T0_20_with_tax <- cbind(as(sigtab_deseq_res_temp_T0_20, "data.frame"), as(tax_table(ps_filtered)[row.names(sigtab_deseq_res_temp_T0_20), ], "matrix"))
+
+# and sort that table by the baseMean column (incase there was more than one taxon)
+sigtab_deseq_res_temp_T0_20_with_tax_ordered <- sigtab_deseq_res_temp_T0_20_with_tax[order(sigtab_deseq_res_temp_T0_20_with_tax$baseMean, decreasing=T), ]
+sigtab_deseq_res_temp_T0_20_with_tax_ordered
+```
+Translation: Several Alteromonadaceae and Pseudoalteromonadaceae and also one ASV from Nitrincolaceae increased from T0 to 20C, similar to the results from QIIME2. No Vibrio, unlike QIIME
+
+
+Since there are several ASVs here, you can also visualize these results in a plot
+```{r}
+# Incase you have many ASVs, define enough colors for the plot
+theme_set(theme_bw())
+scale_fill_discrete <- function(palname = "Set1", ...) {
+  scale_fill_brewer(palette = palname, ...)
+}
+
+# And plot the families, color coding by Class
+x = tapply(sigtab_deseq_res_temp_T0_20_with_tax$log2FoldChange, sigtab_deseq_res_temp_T0_20_with_tax$family, function(x) max(x))
+x = sort(x, TRUE)
+sigtab_deseq_res_temp_T0_20_with_tax$family = factor(as.character(sigtab_deseq_res_temp_T0_20_with_tax$family), levels=names(x))
+ggplot(sigtab_deseq_res_temp_T0_20_with_tax, aes(x=family, y=log2FoldChange, color=class)) + geom_point(size=6) + 
+  theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+```
+
+
+
+*Next Compare Heat Stress (20C) to more extreme heat stress (25C)*
+
+Pull out results
+```{r}
+ # pulling out our results table, we specify the object, the p-value, and what contrast we want to consider by first naming the column, then the two groups we care about
+deseq_res_temp_20_25 <- results(ps_deseq, alpha=0.01, contrast=c("Temperature", "20", "25"))
+
+# Get a glimpse at what this table currently holds with the summary command
+summary(deseq_res_temp_20_25) 
+```
+
+Translation: no ASVs are significantly different between the 20 and 25C samples
+
+
+
+
+*Next Compare Control (Time zero) to extreme heat stress (25C)*
+
+Pull out results
+```{r}
+ # pulling out our results table, we specify the object, the p-value, and what contrast we want to consider by first naming the column, then the two groups we care about
+deseq_res_temp_T0_25 <- results(ps_deseq, alpha=0.01, contrast=c("Temperature", "Time-zero", "25"))
+
+# Get a glimpse at what this table currently holds with the summary command
+summary(deseq_res_temp_T0_25) 
+```
+
+Translation: out of 3466 ASVs, there are 2 that increased when comparing temperature "T0" to "25" and 26 that decreased. Ie. the ones that 'increased' are in higher abundance in "T0" than in "25" and those that decreased are in lower abundance in T0 than in 25.
+
+
+Make a table of the significant results
+```{r}
+# subset the table to only include those ASVs that pass the specified significance level
+sigtab_deseq_res_temp_T0_25 <- deseq_res_temp_T0_25[which(deseq_res_temp_T0_25$padj < 0.01), ]
+
+# pull out their taxonomic affiliation
+sigtab_deseq_res_temp_T0_25_with_tax <- cbind(as(sigtab_deseq_res_temp_T0_25, "data.frame"), as(tax_table(ps_filtered)[row.names(sigtab_deseq_res_temp_T0_25), ], "matrix"))
+
+# and sort that table by the baseMean column (incase there was more than one taxon)
+sigtab_deseq_res_temp_T0_25_with_tax[order(sigtab_deseq_res_temp_T0_25_with_tax$baseMean, decreasing=T), ]
+
+```
+There are lots of Vibrionaceae here that are higher in the heat stressed (25C) samples than T0. Also Pseudoalteromonadaceae, Nitrincolaceae, Rhodobacteraceae. This is all similar to the QIIME results
+Something different than QIIME results: This also identified 2 Arcobacteraceae ASVs: 1 that was higher in the T0 and one that was higher in the 25C. 
+Arcobacter have been identified as possible pathogens in addition to Vibrio
+
+
+Since there are several ASVs here, you can also visualize these results in a plot
+```{r}
+# Incase you have many ASVs, define enough colors for the plot
+theme_set(theme_bw())
+scale_fill_discrete <- function(palname = "Set1", ...) {
+  scale_fill_brewer(palette = palname, ...)
+}
+
+# And plot the families, color coding by Class
+x = tapply(sigtab_deseq_res_temp_T0_25_with_tax$log2FoldChange, sigtab_deseq_res_temp_T0_25_with_tax$family, function(x) max(x))
+x = sort(x, TRUE)
+sigtab_deseq_res_temp_T0_25_with_tax$family = factor(as.character(sigtab_deseq_res_temp_T0_25_with_tax$family), levels=names(x))
+ggplot(sigtab_deseq_res_temp_T0_25_with_tax, aes(x=family, y=log2FoldChange, color=class)) + geom_point(size=6) + 
+  theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+```
+
+#### Export
+Export the data tables as count tables (with no transformation) and without any aggregation.
+
+For this study, I am excluding the antiobiotic samples, as those don't really fir the meta-analysis study. I only want the samples from different  temperatures (time zero, 20, and 25C).
+
+First, filter out any ASVs without a species or genus and agglomerate at the genus-level. This will allow for comparisons to other datasets
+
+```{r}
+# Make a brief descriptive file
+descript_file<-writeLines(c("The phyloseq object in this file are data processed from Green et al. 2019 (doi: 10.1007/s00248-018-1242-9), NCBI BioProject # PRJNA421986.
+The ASV count table was produced using DADA2 (for denoising, merging, and ASV inference) in R, and a Silva v138 DECIPHER classifier for taxonomy calling.
+Samples were collected from Pacific oyster (Crassostrea gigas) samples in Australia. AUthors performed a simulated heat wave in mesocosms to test
+impacts on microbiome.
+The phyloseq object, ps_filtered, was filtered to remove a subset of samples that were also used to test the impact of anitibiotics. The remaining 
+samples here were not treated with antibiotics. The remaining samples correspond to a time-zero (field) collection and a time-4day collection from two 
+different heat stress conditions (20˚C and 25˚C). Each assay has biological triplicates and thus there are 9 total samples.
+On day 4 in the 25˚C treatment, the oysters were showing signs of mortality.
+The metadata in this file come from the SraRunTable and have been modified to clearly indicate temperature and mortality data.
+The otu_table object in the phyloseq object contains absolute abundaces of ASVs, without any tranformation or agglomeration at higher taxonomic levels.
+
+dada2 analysis file (done in R markdown file) =  PRJNA421986.Rmd
+
+processing of qiime2 and preliminary stats file (done in R) = PRJNA421986_PacificOyster_Dada2_postanalysis.Rmd"))
+
+# Export as .RData
+save(ps_filtered, descript_file, file = "../../Processed/PRJNA421986_dada2_processed_data.RData")
+
+```
+
+
